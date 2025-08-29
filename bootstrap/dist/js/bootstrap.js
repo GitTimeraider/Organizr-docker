@@ -2231,7 +2231,18 @@ if (typeof jQuery === 'undefined') {
   var Affix = function (element, options) {
     this.options = $.extend({}, Affix.DEFAULTS, options)
 
-    this.$target = $(this.options.target)
+    // Defensive: Ensure 'target' is always used as a selector, never HTML
+    // This prevents XSS if untrusted options are passed.
+    if (typeof this.options.target === 'string' && this.options.target.trim().charAt(0) === '<') {
+      throw new Error("Unsafe Affix target option: must be a CSS selector or element, not HTML. See documentation for details.");
+    }
+    // The safest way is to use $(document).find(target) so it's always a selector
+    if (typeof this.options.target === 'string') {
+      this.$target = $(document).find(this.options.target)
+    } else {
+      this.$target = $(this.options.target)
+    }
+    this.$target
       .on('scroll.bs.affix.data-api', $.proxy(this.checkPosition, this))
       .on('click.bs.affix.data-api',  $.proxy(this.checkPositionWithEventLoop, this))
 
