@@ -15,13 +15,6 @@ Do you have quite a bit of services running on your computer or server? Do you h
 
 ![OrganizrInfo](https://user-images.githubusercontent.com/16184466/53614285-a9b73480-3b96-11e9-835e-9fadd045582b.png)
 
-- PHP 7.2+
-- [Official Site](https://organizr.app) - Will be refreshed soon!
-- [Official Discord](https://organizr.app/discord)
-
-- [See Wiki](https://docs.organizr.app/) - Will be updated soon!
-- [Docker](https://hub.docker.com/r/organizr/organizr)
-
 ![OrganizrGallery](https://user-images.githubusercontent.com/16184466/53614284-a9b73480-3b96-11e9-9bea-d7a30b294267.png)
 
 <img src="https://user-images.githubusercontent.com/16184466/53615855-35cc5a80-3b9d-11e9-882b-f09f3eb18173.png" width="23%"></img>
