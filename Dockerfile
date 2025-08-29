@@ -14,6 +14,7 @@ RUN set -eux; \
       libfreetype6-dev \
       libwebp-dev \
       libldap2-dev \
+  libsasl2-dev \
       libsqlite3-dev \
       libcurl4-openssl-dev \
       zlib1g-dev \
@@ -28,8 +29,7 @@ RUN set -eux; \
       zip \
       pdo_sqlite \
       sqlite3 \
-      ldap \
-      curl; \
+  ldap; \
     a2enmod rewrite headers expires; \
     rm -rf /var/lib/apt/lists/*
 
