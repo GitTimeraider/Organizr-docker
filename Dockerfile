@@ -1,4 +1,4 @@
-FROM php:8.1-apache
+FROM php:8.4-apache
 
 # Labels for metadata
 LABEL org.opencontainers.image.title="Organizr Docker"
@@ -11,7 +11,7 @@ LABEL org.opencontainers.image.licenses="GPL-3.0"
 # Set working directory
 WORKDIR /var/www/html
 
-FROM php:8.1-apache
+FROM php:8.4-apache
 
 # Labels for metadata
 LABEL org.opencontainers.image.title="Organizr Docker"
