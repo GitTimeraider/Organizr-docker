@@ -49,7 +49,6 @@ Do you have quite a bit of services running on your computer or server? Do you h
 - Unlimited User Groups
 - Upload new icons with ease
 - User management support: Create, delete and promote users from the user management console
-- Many more...
 
 ![OrganizrFeatReq](https://user-images.githubusercontent.com/16184466/53614286-a9b73480-3b96-11e9-8495-4944b85b1313.png)
 
