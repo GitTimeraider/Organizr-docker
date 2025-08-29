@@ -1,5 +1,13 @@
 /*jslint browser: true*/
 /*global $, jQuery, alert*/
+
+// Allow only http(s) or root-relative URLs
+function isSafeUrl(url) {
+    if (typeof url !== "string") return false;
+    // allow http://, https://, // (protocol-relative), or root-relative /
+    return /^(https?:\/\/|\/\/|\/(?!\/))[^ \r\n]+$/i.test(url);
+}
+
 var idleTime = 0;
 var hasCookie = false;
 var loginAttempts = 0;
@@ -1366,9 +1374,15 @@ $(document).on("click", ".openTab", function(e) {
         var tabName = $(this).attr("data-tab-name");
         var container = $("#container-"+tabName);
         var activeFrame = container.children('iframe');
+        var rawUrl = $(this).attr("data-url");
         if(activeFrame.length === 1){
             $('#menu-'+tabName+' a').trigger("click");
-            activeFrame.attr("src", $(this).attr("data-url"));
+            if (isSafeUrl(rawUrl)) {
+                activeFrame.attr("src", rawUrl);
+            } else {
+                console.warn("Blocked unsafe URL in data-url:", rawUrl);
+                // Optionally, show error to user here
+            }
         }else{
             container.attr("data-url", $(this).attr("data-url"));
             $('#menu-'+tabName+' a').trigger("click");
