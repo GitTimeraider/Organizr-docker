@@ -47,48 +47,140 @@ Do you have quite a bit of services running on your computer or server? Do you h
 
 ![OrganizrDocker](https://user-images.githubusercontent.com/16184466/53667702-fcdcc600-3c2e-11e9-8828-860e531e8096.png)
 
-[![Repository](https://img.shields.io/github/stars/organizr/docker-organizr?color=402885&style=for-the-badge&logo=github&logoColor=41add3&)](https://github.com/Organizr/docker-organizr)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/organizr/docker-organizr/Build%20Container?color=402885&style=for-the-badge&logo=github&logoColor=41add3)](https://github.com/organizr/docker-organizr/actions?query=workflow%3A%22Build+Container%22)
-[![Docker Pulls](https://img.shields.io/docker/pulls/organizr/organizr?color=402885&style=for-the-badge&logo=docker&logoColor=41add3)](https://hub.docker.com/r/organizr/organizr/)
+[![Repository](https://img.shields.io/github/stars/GitTimeraider/organizr-docker?color=402885&style=for-the-badge&logo=github&logoColor=41add3&)](https://github.com/GitTimeraider/Organizr-docker)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/GitTimeraider/organizr-docker/build-and-push.yml?branch=main&color=402885&style=for-the-badge&logo=github&logoColor=41add3)](https://github.com/GitTimeraider/organizr-docker/actions)
+[![GHCR Pulls](https://img.shields.io/badge/ghcr.io-pulls-402885?style=for-the-badge&logo=docker&logoColor=41add3)](https://ghcr.io/gittimeraider/organizr-docker)
 
-##### Usage
+## 🐳 Docker Images
 
+This project provides multi-architecture Docker images hosted on GitHub Container Registry (GHCR).
+
+### Supported Architectures
+- `linux/amd64` (x86_64)
+- `linux/arm64` (ARM64/AArch64)
+
+### Available Tags
+- `latest` - Latest stable release from main branch
+- `dev` - Development builds from develop branch  
+- `v2.x.x` - Specific version tags
+- `main` - Latest commit from main branch
+
+### Quick Start
+
+#### Docker Run
 ```bash
-docker create \
+docker run -d \
   --name=organizr \
-  -v <path to data>:/config \
-  -e PGID=<gid> -e PUID=<uid>  \
   -p 80:80 \
-  -e fpm="false" `#optional` \
-  -e branch="v2-master" `#optional` \
-  organizr/organizr
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=America/New_York \
+  -v /path/to/config:/config \
+  --restart unless-stopped \
+  ghcr.io/gittimeraider/organizr-docker:latest
 ```
 
-  ##### GHCR Image
+#### Docker Compose
+```yaml
+version: "3.8"
+services:
+  organizr:
+    image: ghcr.io/gittimeraider/organizr-docker:latest
+    container_name: organizr
+    ports:
+      - "80:80"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - FPM=false
+      - BRANCH=v2-master
+    volumes:
+      - ./config:/config
+    restart: unless-stopped
+```
 
-  This repository also publishes an image to GitHub Container Registry (compatible envs and volume mapping):
+### Parameters
 
-  ```bash
-  docker pull ghcr.io/gittimeraider/organizr-docker:latest
-  docker run -d --name organizr ^
-    -p 80:80 ^
-    -e PGID=1000 -e PUID=1000 ^
-    -e fpm="false" ^
-    -e branch="v2-master" ^
-    -v C:\\path\\to\\config:/config ^
-    ghcr.io/gittimeraider/organizr-docker:latest
-  ```
+| Parameter | Function |
+| :----: | --- |
+| `-p 80:80` | HTTP port for web interface |
+| `-e PUID=1000` | UserID for file permissions |
+| `-e PGID=1000` | GroupID for file permissions |
+| `-e TZ=UTC` | Timezone (e.g., America/New_York) |
+| `-e FPM=false` | Enable/disable FPM (optional) |
+| `-e BRANCH=v2-master` | Organizr branch to use (optional) |
+| `-v /config` | Persistent config directory |
 
-##### Parameters
+### User / Group Identifiers
 
-The parameters are split into two halves, separated by a colon, the left hand side representing the host and the right the container side. For example with a port -p external:internal - what this shows is the port mapping from internal to external of the container. So `-p 8080:80` would expose port 80 from inside the container to be accessible from the host's IP on port 8080 and `http://192.168.x.x:8080` would show you what's running INSIDE the container on port 80.
+When using volumes (`-v` flags), permissions issues can arise between the host OS and the container. To avoid this, you can specify the user `PUID` and group `PGID`.
 
-- `-p 80` - The port(s)
-- `-v /config` - Mapping the config files for Organizr
-- `-e PGID` Used for GroupID - see below for link
-- `-e PUID` Used for UserID - see below for link
+Ensure any volume directories on the host are owned by the same user you specify:
+```bash
+chown -R 1000:1000 /path/to/config
+```
 
-The optional parameters and GID and UID are described in the [readme](https://github.com/Organizr/docker-organizr#parameters) for the container.
+### Health Check
+
+The container includes a built-in health check that verifies the web service is responding:
+```bash
+docker exec organizr curl -f http://localhost:80/ || exit 1
+```
+
+### User / Group Identifiers
+
+When using volumes (`-v` flags), permissions issues can arise between the host OS and the container. To avoid this, you can specify the user `PUID` and group `PGID`.
+
+Ensure any volume directories on the host are owned by the same user you specify:
+```bash
+chown -R 1000:1000 /path/to/config
+```
+
+### Health Check
+
+The container includes a built-in health check that verifies the web service is responding:
+```bash
+docker exec organizr curl -f http://localhost:80/ || exit 1
+```
+
+### Building Locally
+
+To build the image locally for development:
+
+```bash
+# Clone the repository
+git clone https://github.com/GitTimeraider/Organizr-docker.git
+cd Organizr-docker
+
+# Build the image
+docker build -t organizr-local .
+
+# Run locally built image
+docker run -d --name organizr-local \
+  -p 80:80 \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -v ./config:/config \
+  organizr-local
+```
+
+### Development
+
+Use the provided `compose.local.yml` for local development:
+
+```bash
+# Start development environment
+docker-compose -f compose.local.yml up -d
+
+# View logs
+docker-compose -f compose.local.yml logs -f
+
+# Stop and cleanup
+docker-compose -f compose.local.yml down
+```
+
+The optional parameters and GID and UID are described in the documentation.
 
 ##### Info
 

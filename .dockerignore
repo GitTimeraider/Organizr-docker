@@ -2,6 +2,7 @@
 .git
 .github
 .gitignore
+.gitattributes
 
 # Node/build caches
 node_modules
@@ -13,12 +14,31 @@ yarn-error.log*
 .DS_Store
 *.swp
 .vscode
+.idea
+Thumbs.db
+
+# Development files
+scripts/
+docs/
+tmp/
+*.md
+LICENSE
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+.all-contributorsrc
+
+# Docker files (not needed in context)
+docker-compose.yml
+compose.local.yml
+
+# Logs and temp files
+*.log
+*.tmp
 
 # PHP vendor cache can be included since already committed; ignore composer artifacts if present
 composer.lock
 composer.phar
 vendor/**/.git
 
-# Tests and docs that aren't needed at runtime
-scripts/
-docs/
+# Config files that should be mounted
+config/
