@@ -7121,10 +7121,15 @@ function buildDownloaderCombined(source){
     }
 }
 function buildMetadata(array, source){
-	var metadata = '';
-	var genres = '';
-	var actors = '';
-	var rating = '<div class="col-xs-2 p-10"></div>';
+    // Whitelist the source to allowed values only to prevent XSS
+    var allowedSources = ['plex', 'emby', 'jellyfin'];
+    if (allowedSources.indexOf(source) === -1) {
+        source = 'plex';
+    }
+    var metadata = '';
+    var genres = '';
+    var actors = '';
+    var rating = '<div class="col-xs-2 p-10"></div>';
     var sourceIcon = (source === 'jellyfin') ? 'fish' : source;
 	$.each(array.content, function(i,v) {
 		var hasActor = (typeof v.metadata.actors !== 'string') ? true : false;
