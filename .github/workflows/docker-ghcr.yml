@@ -5,7 +5,7 @@ on:
     branches: [ "**" ]
     tags: [ 'v*' ]
   pull_request:
-    branches: [ main, master ]
+  branches: [ "**" ]
   workflow_dispatch:
 
 env:
@@ -21,6 +21,10 @@ jobs:
       id-token: write
 
     steps:
+      - name: CI context
+        run: |
+          echo "event=${{ github.event_name }} ref=${{ github.ref }} sha=${{ github.sha }} actor=${{ github.actor }} repo=${{ github.repository }}"
+
       - name: Checkout repository
         uses: actions/checkout@v5
 
@@ -54,13 +58,20 @@ jobs:
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
 
+      - name: Build (PR only, local load)
+        if: github.event_name == 'pull_request'
+        run: |
+          docker version
+          docker buildx version || true
+          docker build --pull --tag test-local:pr .
+
       - name: Build and push Docker image
+        if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: ${{ github.event_name == 'pull_request' && 'linux/amd64' || 'linux/amd64,linux/arm64' }}
-          push: ${{ github.event_name != 'pull_request' }}
-          load: ${{ github.event_name == 'pull_request' }}
+          platforms: linux/amd64,linux/arm64
+          push: true
           pull: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
