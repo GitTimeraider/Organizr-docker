@@ -1795,7 +1795,7 @@ $(document).on('click', ".copyDebug", function(){
 // AccountDN change
 $(document).on("keyup", "#authBackendHostPrefix-input, #authBackendHostSuffix-input", function () {
     var newDN = $('#authBackendHostPrefix-input').val() + 'TestAcct' + $('#authBackendHostSuffix-input').val();
-    $('#accountDN').html(newDN);
+    $('#accountDN').text(newDN);
 });
 
 // homepage healthchecks
