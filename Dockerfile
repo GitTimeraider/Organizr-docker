@@ -1,34 +1,4 @@
-# Build stage
-FROM php:8.1-apache as builder
-
-# Install system dependencies for building
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    zip \
-    unzip \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install PHP extensions
-RUN docker-php-ext-install \
-    pdo_mysql \
-    mbstring \
-    exif \
-    pcntl \
-    bcmath \
-    gd \
-    zip
-
-# Copy source code for processing
-COPY . /app/
-WORKDIR /app
-
-# Production stage
-FROM php:8.1-apache as production
+FROM php:8.1-apache
 
 # Labels for metadata
 LABEL org.opencontainers.image.title="Organizr Docker"
@@ -41,20 +11,26 @@ LABEL org.opencontainers.image.licenses="GPL-3.0"
 # Set working directory
 WORKDIR /var/www/html
 
-# Install runtime dependencies only
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    libpng16-16 \
-    libonig5 \
-    libxml2 \
-    libzip4 \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
     cron \
-    gosu \
+    curl \
+    zip \
+    unzip \
+    && docker-php-ext-install \
+        pdo_mysql \
+        mbstring \
+        exif \
+        pcntl \
+        bcmath \
+        gd \
+        zip \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
-
-# Copy PHP extensions from builder stage
-COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
-COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 
 # Enable Apache modules
 RUN a2enmod rewrite headers
@@ -65,7 +41,7 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
     && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 # Copy application files
-COPY --from=builder /app/ /var/www/html/
+COPY . /var/www/html/
 
 # Create necessary directories
 RUN mkdir -p /config \
@@ -80,21 +56,21 @@ ENV PUID=1000 \
     TZ=UTC
 
 # Create entrypoint script
-COPY <<'EOF' /entrypoint.sh
+RUN cat > /entrypoint.sh << 'EOF'
 #!/bin/bash
 set -e
 
 # Handle timezone
 if [ ! -z "$TZ" ]; then
-    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
-    echo $TZ > /etc/timezone
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime || true
+    echo $TZ > /etc/timezone || true
 fi
 
 # Handle user/group ID changes
-if [ "$PUID" != "1000" ] || [ "$PGID" != "1000" ]; then
+if [ "$PUID" != "33" ] || [ "$PGID" != "33" ]; then
     echo "Updating user/group IDs..."
-    groupmod -g $PGID www-data
-    usermod -u $PUID -g $PGID www-data
+    groupmod -g $PGID www-data 2>/dev/null || true
+    usermod -u $PUID -g $PGID www-data 2>/dev/null || true
 fi
 
 # Ensure proper permissions
@@ -119,7 +95,7 @@ if [ ! -L /var/www/html/api/config/config.php ] && [ ! -f /var/www/html/api/conf
 fi
 
 echo "Starting Organizr..."
-exec gosu www-data apache2-foreground
+exec apache2-foreground
 EOF
 
 RUN chmod +x /entrypoint.sh
