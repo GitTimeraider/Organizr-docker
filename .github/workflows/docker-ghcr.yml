@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: gittimeraider/directadmin-emailforwarder
+  IMAGE_NAME: gittimeraider/organizr-docker
 
 jobs:
   build:
@@ -62,3 +62,4 @@ jobs:
           build-args: |
             USER_UID=1000
             USER_GID=1000
+
