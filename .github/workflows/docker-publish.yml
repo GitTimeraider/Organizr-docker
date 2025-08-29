@@ -2,8 +2,8 @@ name: Docker Publish (GHCR)
 
 on:
   push:
-    branches: [ "**" ]
-    tags: [ 'v*' ]
+  branches: [ "**" ]
+  tags: [ 'v*' ]
   workflow_dispatch:
 
 permissions:
