@@ -1,7 +1,7 @@
 # OCI-compliant image for Organizr using Apache + PHP
 # Includes common extensions needed by this repo (sqlite, mbstring, curl, ldap, gd, zip)
 
-FROM php:8.2-apache
+FROM php:8.4-apache
 
 # Install system deps and PHP extensions
 RUN set -eux; \
