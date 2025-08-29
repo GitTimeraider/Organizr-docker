@@ -1,16 +1,18 @@
 # OCI-compliant image for Organizr using Apache + PHP
 # Includes common extensions needed by this repo (sqlite, mbstring, curl, ldap, gd, zip)
 
-FROM php:8.4-apache
+FROM php:8.3-apache
 
 # Install system deps and PHP extensions
 RUN set -eux; \
     apt-get update; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+  dpkg-dev \
       libzip-dev \
       libpng-dev \
       libjpeg-dev \
       libfreetype6-dev \
+      libwebp-dev \
       libldap2-dev \
       libsqlite3-dev \
       libcurl4-openssl-dev \
@@ -18,8 +20,8 @@ RUN set -eux; \
       ca-certificates \
       curl \
       unzip; \
-    docker-php-ext-configure gd --with-freetype --with-jpeg; \
-    docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu; \
+    docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp; \
+  docker-php-ext-configure ldap --with-libdir=lib/"$(dpkg-architecture --query DEB_HOST_MULTIARCH)"; \
     docker-php-ext-install -j"$(nproc)" \
       gd \
       mbstring \
