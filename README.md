@@ -81,6 +81,21 @@ docker create \
   organizr/organizr
 ```
 
+  ##### GHCR Image
+
+  This repository also publishes an image to GitHub Container Registry (compatible envs and volume mapping):
+
+  ```bash
+  docker pull ghcr.io/gittimeraider/organizr-docker:latest
+  docker run -d --name organizr ^
+    -p 80:80 ^
+    -e PGID=1000 -e PUID=1000 ^
+    -e fpm="false" ^
+    -e branch="v2-master" ^
+    -v C:\\path\\to\\config:/config ^
+    ghcr.io/gittimeraider/organizr-docker:latest
+  ```
+
 ##### Parameters
 
 The parameters are split into two halves, separated by a colon, the left hand side representing the host and the right the container side. For example with a port -p external:internal - what this shows is the port mapping from internal to external of the container. So `-p 8080:80` would expose port 80 from inside the container to be accessible from the host's IP on port 8080 and `http://192.168.x.x:8080` would show you what's running INSIDE the container on port 80.
